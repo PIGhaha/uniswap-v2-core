@@ -42,7 +42,7 @@ contract UniswapV2Factory is IUniswapV2Factory {
         * create new contract with men[p...p(p+n)] at adress keccak256(0xff.this.s.kecak256(men[p...p(p+n)])
         * and send v wei and return the new address, where 0xff is a 1 byte value, this is the current 
         * contract's address as a 20 byte value and s is the big-endian 256-bit value
-        *
+        */
 
         assembly {
             pair := create2(0, add(bytecode, 32), mload(bytecode), salt)
