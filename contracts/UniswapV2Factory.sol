@@ -52,9 +52,9 @@ contract UniswapV2Factory is IUniswapV2Factory {
         //双向记录同一交易对
         getPair[token0][token1] = pair;
         getPair[token1][token0] = pair; // populate mapping in the reverse direction
-        将新交易对地址传入数组以便于合约外部索引和遍历
+        //将新交易对地址传入数组以便于合约外部索引和遍历
         allPairs.push(pair);
-        触发交易对创建事件
+        //触发交易对创建事件
         emit PairCreated(token0, token1, pair, allPairs.length);
     }
         //设置税收地址
