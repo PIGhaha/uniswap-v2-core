@@ -1,9 +1,18 @@
+//交易对(pair)合约的父合约，实现了ERC20代币功能并增加了对线下签名消息进行授权的支持。
 pragma solidity =0.5.16;
 
+//合约实现的接口代表了它的基本功能
 import './interfaces/IUniswapV2ERC20.sol';
+//防溢出数学工具库
 import './libraries/SafeMath.sol';
 
+//定义了该合约必须实现导入的 IUniswapV2ERC20 接口，该接口是由标准ERC20接口加上自定义的线下签名消息支持接口
+//组成。所以UniswapV2ERC20 也是一个ERC20代币合约
 contract UniswapV2ERC20 is IUniswapV2ERC20 {
+    //using A for *; 的效果是，库 A 中的函数被附加在任意的类型上。
+    //using A for B;通过引入一个模块，不需要再添加代码就可以使用包括库函数在内的数据类型。
+    //在这两种情况下，所有函数都会被附加一个参数，即使它们的第一个参数类型与对象的类型不匹配。函数调用和
+    //重载解析时才会做类型检查
     using SafeMath for uint;
 
     string public constant name = 'Uniswap V2';
