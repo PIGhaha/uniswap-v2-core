@@ -1,28 +1,45 @@
 pragma solidity =0.5.16;
 
+//下两行导入了交易对需要实现的接口和交易对的父合约
 import './interfaces/IUniswapV2Pair.sol';
 import './UniswapV2ERC20.sol';
+//导入自定义的Math库 两个功能：1.求unit最小值 2.对一个uint进行开方运算
 import './libraries/Math.sol';
+//导入自定义的数据格式库 V2使用 unit112 保存交易对中资产的数量， 而比值(价格)使用UQ112x112表示
+//小数点前后各有112位，剩下的(256-224=)32位
 import './libraries/UQ112x112.sol';
+//标准ERC20接口，在获取交易对合约资产池的代币数量(余额)时使用
 import './interfaces/IERC20.sol';
+//factory合约相关接口，主要用于获取开发团队手续费地址
 import './interfaces/IUniswapV2Factory.sol';
+//有些第三方合约希望接收到代币后进行其他操作(好比异步执行中的回调函数)。IUniswapV2Callee约定了
+//执行回调函数必须实现的接口格式
 import './interfaces/IUniswapV2Callee.sol';
 
+//本合约实现了 IUniswapV2Pair 并继承了 UniswapV2ERC20 ，继承一个合约表明它继承了父合约的所有非私有的接口与状态变量。
 contract UniswapV2Pair is IUniswapV2Pair, UniswapV2ERC20 {
+    //指定库函数的应用类型
     using SafeMath  for uint;
     using UQ112x112 for uint224;
 
+    //定义了最小流动性minimum_liquidity = 1000, 用于在提供初始流动性时burn掉
     uint public constant MINIMUM_LIQUIDITY = 10**3;
+    //计算标准ERC20合约中转移代币函数 transfer 的函数选择器，用于call合约调用中
     bytes4 private constant SELECTOR = bytes4(keccak256(bytes('transfer(address,uint256)')));
 
+    //记录factory合约地址和两种代币的合约地址
+    //public 表示合约外可以直接通过同名函数获取对应的值
     address public factory;
     address public token0;
     address public token1;
 
+    //记录了最新的恒定乘积中两种资产的数量和交易时的区块创建时间
     uint112 private reserve0;           // uses single storage slot, accessible via getReserves
     uint112 private reserve1;           // uses single storage slot, accessible via getReserves
     uint32  private blockTimestampLast; // uses single storage slot, accessible via getReserves
 
+
+    //交易对中两种价格的累计值
     uint public price0CumulativeLast;
     uint public price1CumulativeLast;
     uint public kLast; // reserve0 * reserve1, as of immediately after the most recent liquidity event
