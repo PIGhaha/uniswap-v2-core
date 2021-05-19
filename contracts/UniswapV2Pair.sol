@@ -112,7 +112,6 @@ contract UniswapV2Pair is IUniswapV2Pair, UniswapV2ERC20 {
 
         uint _kLast = kLast; // gas savings
         if (feeOn) {
-            //打开后的k
             if (_kLast != 0) {
                 uint rootK = Math.sqrt(uint(_reserve0).mul(_reserve1));
                 uint rootKLast = Math.sqrt(_kLast);
@@ -133,6 +132,8 @@ contract UniswapV2Pair is IUniswapV2Pair, UniswapV2ERC20 {
     // this low-level function should be called from a contract which performs important safety checks
     function mint(address to) external lock returns (uint liquidity) {
         (uint112 _reserve0, uint112 _reserve1,) = getReserves(); // gas savings
+        //reserve更新延迟于balance, 其差值即为当前合约注入的两种资产数量
+        //除闪电贷(FlashSwap外) 先转移代币，再调用合约
         uint balance0 = IERC20(token0).balanceOf(address(this));
         uint balance1 = IERC20(token1).balanceOf(address(this));
         uint amount0 = balance0.sub(_reserve0);
@@ -147,9 +148,14 @@ contract UniswapV2Pair is IUniswapV2Pair, UniswapV2ERC20 {
             liquidity = Math.min(amount0.mul(_totalSupply) / _reserve0, amount1.mul(_totalSupply) / _reserve1);
         }
         require(liquidity > 0, 'UniswapV2: INSUFFICIENT_LIQUIDITY_MINTED');
+        //增发新的流动性给接收者
         _mint(to, liquidity);
-
+        
+        //更新当前保存的恒定乘积中的两种资产的值
         _update(balance0, balance1, _reserve0, _reserve1);
+        
+        //如果手续费打开， 更新最近一次的乘积值
+        //该值不随平常的代币交易更新，尽在提供流动性供给时计算开发团队手续费
         if (feeOn) kLast = uint(reserve0).mul(reserve1); // reserve0 and reserve1 are up-to-date
         emit Mint(msg.sender, amount0, amount1);
     }
