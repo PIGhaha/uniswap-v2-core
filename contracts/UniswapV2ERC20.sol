@@ -61,7 +61,7 @@ contract UniswapV2ERC20 is IUniswapV2ERC20 {
         );
     }
     
-    //铸币函数 internal 内部函数
+    //铸币函数 internal 外部无法调用
     function _mint(address to, uint value) internal {
         totalSupply = totalSupply.add(value);
         balanceOf[to] = balanceOf[to].add(value);
