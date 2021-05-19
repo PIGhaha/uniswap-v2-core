@@ -104,14 +104,21 @@ contract UniswapV2Pair is IUniswapV2Pair, UniswapV2ERC20 {
 
     // if fee is on, mint liquidity equivalent to 1/6th of the growth in sqrt(k)
     function _mintFee(uint112 _reserve0, uint112 _reserve1) private returns (bool feeOn) {
+        //获取开发者团队手续费地址
         address feeTo = IUniswapV2Factory(factory).feeTo();
+        //根据该地址是否为0判断开关是否打开
         feeOn = feeTo != address(0);
+        //使用一个局部变量记录过去某时刻恒定乘积的值，kLast即K1
+
         uint _kLast = kLast; // gas savings
         if (feeOn) {
+            //打开后的k
             if (_kLast != 0) {
                 uint rootK = Math.sqrt(uint(_reserve0).mul(_reserve1));
                 uint rootKLast = Math.sqrt(_kLast);
                 if (rootK > rootKLast) {
+                    //转给开发团队手续费的计算公式 
+                    //numerator 分子；denominator 分母
                     uint numerator = totalSupply.mul(rootK.sub(rootKLast));
                     uint denominator = rootK.mul(5).add(rootKLast);
                     uint liquidity = numerator / denominator;
