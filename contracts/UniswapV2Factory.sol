@@ -50,6 +50,13 @@ contract UniswapV2Factory is IUniswapV2Factory {
             pair := create2(0, add(bytecode, 32), mload(bytecode), salt)
         }
         //调用 pair 合约的初始化方法， 传入排序后的 token 地址(create2函数创建合约时无法提供构造器参数来初始化)
+        /*
+        function initialize(address _token0, address _token1) external {
+        require(msg.sender == factory, 'UniswapV2: FORBIDDEN'); // sufficient check
+        token0 = _token0;
+        token1 = _token1;
+    }
+    */
         IUniswapV2Pair(pair).initialize(token0, token1);
         //双向记录同一交易对
         getPair[token0][token1] = pair;
