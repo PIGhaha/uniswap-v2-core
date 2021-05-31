@@ -9,7 +9,9 @@ contract UniswapV2Factory is IUniswapV2Factory {
 
     mapping(address => mapping(address => address)) public getPair;
     address[] public allPairs;
-
+    
+    //最多三个参数可以接受 indexed 属性，他们的 keccak-256 哈希值会被作为 topic 保存
+    //所有非索引 indexed 参数是 ABI-encoded 都将存储在日志的数据部分
     event PairCreated(address indexed token0, address indexed token1, address pair, uint);
 
     constructor(address _feeToSetter) public {
