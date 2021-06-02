@@ -246,7 +246,7 @@ contract UniswapV2Pair is IUniswapV2Pair, UniswapV2ERC20 {
         }
         
         //计算实际转移进来的代币数量（？）
-        //其中有一种转出代币数量为0
+        //其中有不大于一种转出代币数量为0
         //转入代币数量 = 余额 > 储备量 - 转出代币数量 ? 余额 - （储备量 - 转出代币数量） ：0
         uint amount0In = balance0 > _reserve0 - amount0Out ? balance0 - (_reserve0 - amount0Out) : 0;
         uint amount1In = balance1 > _reserve1 - amount1Out ? balance1 - (_reserve1 - amount1Out) : 0;
